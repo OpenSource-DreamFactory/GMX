@@ -1,0 +1,1 @@
+module.exports = ["WETH", "weth", 7];
