@@ -1,0 +1,39 @@
+version: '3'
+
+services:
+  app:
+    container_name: tracer-swaps-liquidator
+    build: .
+    ports:
+      - "${PORT}:8080"
+    environment:
+      DB_URL: "mongodb://${DB_USER}:${DB_PASSWORD}@mongo:27017/${DB_NAME}"
+      RPC_URL: "${RPC_URL}"
+      FALLBACK_RPC_URL: "${FALLBACK_RPC_URL}"
+      LIQUIDATOR_PRIVATE_KEY: "${LIQUIDATOR_PRIVATE_KEY}"
+      PORT: "8080"
+      FROM_BLOCK: "${FROM_BLOCK}"
+      MAX_PROCESS_BLOCK: "${MAX_PROCESS_BLOCK}"
+      VAULT_ADDRESS: "${VAULT_ADDRESS}"
+      POSITION_MANAGER_ADDRESS: "${POSITION_MANAGER_ADDRESS}"
+      INTERVAL_MS: "${INTERVAL_MS}"
+      MAX_LEVERAGE_BPS: "${MAX_LEVERAGE_BPS}"
+    links:
+      - mongo
+
+  mongo:
+    container_name: mongo
+    image: "mongo"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "${DB_USER}"
+      MONGO_INITDB_ROOT_PASSWORD: "${DB_PASSWORD}"
+      MONGO_INITDB_DATABASE: "${DB_NAME}"
+    volumes:
+      - db-data:/db
+      - "./init-mongo.sh:/docker-entrypoint-initdb.d/init-mongo.sh"
+    ports:
+      - "27017:27017"
+
+
+volumes:
+  db-data:
